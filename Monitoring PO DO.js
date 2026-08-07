@@ -1,30 +1,34 @@
 db.t_purchase_order.aggregate([
     {
         $match: {
-// 				_id:/PO2026/i,
-// 				status:{$nin:[/reject/i]},
-$or:[{srmSubBidang:/lisdes/i},{isLisdes:true}],
-//             _id: {
-//                 $in: [
-//                     "PO202600009426",
-//                     "PO202600007937",
-//                     "PO202100001405",
-//                     
+            // 				_id:/PO2026/i,
+            // 				status:{$nin:[/reject/i]},
+            $or: [{
+                srmSubBidang: /lisdes/i
+            }, {
+                isLisdes: true
+            }],
+//                         _id: {
+//                             $in: [
+//                                 "PO202500009434",
+//                                 
+//                             ]
+//                         }
+//             $expr: {
+//                 $and: [
+//                     // 														{
+//                     //                                 $eq: [{
+//                     //                                     $month: "$createdDate"
+//                     //                                 }, 10] // 1 untuk Januari
+//                     //                             }, 
+//                     {
+//                         $eq: [{
+//                             $year: "$createdDate"
+//                         }, 2026] // 1 untuk Januari},]}
+//                     }
 //                 ]
-//             }
-                        $expr: {
-                            $and: [
-// 														{
-//                                 $eq: [{
-//                                     $month: "$createdDate"
-//                                 }, 10] // 1 untuk Januari
-//                             }, 
-														{
-                                $eq: [{
-                                    $year: "$createdDate"
-                                }, 2026] // 1 untuk Januari},]}
-                            }]
-                        },
+//             },
+            
         },
         
     },
@@ -57,7 +61,9 @@ $or:[{srmSubBidang:/lisdes/i},{isLisdes:true}],
             buyerCode: "$buyerCode",
             buyerName: "$buyerName",
             picUserId: "$picUserId",
-            nopoAms: "$nopoAms",
+            nopoAms: {
+                $ifNull: ["$nopoAms", "-"]
+            },
             status: "$status",
             poSendSupplierDate: "$poSendSupplierDate",
             "bankGaransi": {
@@ -673,7 +679,7 @@ $or:[{srmSubBidang:/lisdes/i},{isLisdes:true}],
                             qtyTerima: "$detail.qtyTerima",
                             noekspedisi: "$noekspedisi",
                             namaKurir: "$namaKurir",
-                        namaEkspedisi: "$namaEkspedisi",
+                            namaEkspedisi: "$namaEkspedisi",
                             etd: "$etd",
                             eta: "$eta",
                             tanggalTerima: "$detail.tanggalDiterima",
@@ -736,7 +742,7 @@ $or:[{srmSubBidang:/lisdes/i},{isLisdes:true}],
                                 else : "-"
                             }
                         },
-												namaEkspedisi: {
+                        namaEkspedisi: {
                             $cond: {
                                 if : {
                                     $ifNull: ["$_id.namaEkspedisi", false],
@@ -1039,350 +1045,428 @@ $or:[{srmSubBidang:/lisdes/i},{isLisdes:true}],
             }
         }
     },
-{
-    $project: {
-        _id: 0,
-        "No PO": "$_id._id",
-        "No PO SAP": "$_id.noPoSAP",
-        "Tanggal PO": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.tglPO", null]
-                        },
-                        {
-                            $eq: ["$_id.tglPO", "-"]
+    {
+        $project: {
+            _id: 0,
+            "No PO": "$_id._id",
+            "No PO SAP": "$_id.noPoSAP",
+            "Tanggal PO": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.tglPO", null]
+                            },
+                            {
+                                $eq: ["$_id.tglPO", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.tglPO"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.tglPO"
                     }
                 }
-            }
-        },
-        "Tanggal PO Dikirim": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.kirimPO", null]
-                        },
-                        {
-                            $eq: ["$_id.kirimPO", "-"]
+            },
+            "Tanggal PO Dikirim": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.kirimPO", null]
+                            },
+                            {
+                                $eq: ["$_id.kirimPO", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.kirimPO"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.kirimPO"
                     }
                 }
-            }
-        },
-        "Nama Penyedia": "$_id.supplierName",
-        "Nama Unit Pengguna": "$_id.buyerName",
-        "Bidang": "$_id.srmSubBidang", // blm ada
-        "Rating PO": "$_id.rating",
-        "No AMS": "$_id.nopoAms",
-        "No Kontrak": "$_id.noKontrak", // blm ada DONE
-        "No Alokasi": "$_id.noAlokasi", // blm ada DONE
-        "No SKU": "$_id.sku",
-        "No Material SAP": "$_id.noSap",
-        "Nama SKU": "$_id.skuName",
-        "Qty PO": "$_id.qty",
-        "Harga Satuan PO": "$_id.hargaSatuan",
-        "Total Harga Satuan PO": "$_id.hargaBarangTotal",
-        "Max Waktu Pengiriman": "$_id.maxReceivedDay",
-        "Subtotal PO": "$_id.subTotalPO",
-        "Biaya Kirim": "$_id.biayaKirimSatuan",
-        "PPN": "$_id.ppn",
-        "Total PO": "$_id.hargaTotal",
-        "Tanggal BABG": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.tanggalBankGaransi", null]
-                        },
-                        {
-                            $eq: ["$_id.tanggalBankGaransi", "-"]
+            },
+            "Nama Penyedia": "$_id.supplierName",
+            "Nama Unit Pengguna": "$_id.buyerName",
+            "Bidang": "$_id.srmSubBidang", // blm ada
+            "Rating PO": "$_id.rating",
+            "No AMS": "$_id.nopoAms",
+            "No Kontrak": "$_id.noKontrak", // blm ada DONE
+            "No Alokasi": "$_id.noAlokasi", // blm ada DONE
+            "No SKU": "$_id.sku",
+            "No Material SAP": "$_id.noSap",
+            "Nama SKU": "$_id.skuName",
+            "Qty PO": "$_id.qty",
+            "Harga Satuan PO": "$_id.hargaSatuan",
+            "Total Harga Satuan PO": "$_id.hargaBarangTotal",
+            "Max Waktu Pengiriman": "$_id.maxReceivedDay",
+            "Subtotal PO": "$_id.subTotalPO",
+            "Biaya Kirim": "$_id.biayaKirimSatuan",
+            "PPN": "$_id.ppn",
+            "Total PO": "$_id.hargaTotal",
+            "Tanggal BABG": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.tanggalBankGaransi", null]
+                            },
+                            {
+                                $eq: ["$_id.tanggalBankGaransi", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.tanggalBankGaransi"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.tanggalBankGaransi"
                     }
                 }
-            }
-        },
-        "Kategori PO": "$_id.isLisdes", // blm ada, lisdes2an
-        "Status PO": "$_id.status",
-        "Status Payment": "$_id.statusInvoicePayment", // blm ada payment vip keknya
-        "No DO": "$_id.noDO",
-        "Tanggal DO": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.doKirim", null]
-                        },
-                        {
-                            $eq: ["$_id.doKirim", "-"]
+            },
+            "Kategori PO": "$_id.isLisdes", // blm ada, lisdes2an
+            "Status PO": "$_id.status",
+            "Status Payment": "$_id.statusInvoicePayment", // blm ada payment vip keknya
+            "No DO": "$_id.noDO",
+            "Tanggal DO": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.doKirim", null]
+                            },
+                            {
+                                $eq: ["$_id.doKirim", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.doKirim"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.doKirim"
                     }
                 }
-            }
-        },
-        "Qty DO Kirim": "$_id.qtyKirim",
-        "Qty DO Terima": "$_id.qtyTerima",
-        "Tanggal Penerimaan DO": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.tanggalDiterima", null]
-                        },
-                        {
-                            $eq: ["$_id.tanggalDiterima", "-"]
+            },
+            "Qty DO Kirim": "$_id.qtyKirim",
+            "Qty DO Terima": "$_id.qtyTerima",
+            "Tanggal Penerimaan DO": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.tanggalDiterima", null]
+                            },
+                            {
+                                $eq: ["$_id.tanggalDiterima", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.tanggalDiterima"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.tanggalDiterima"
                     }
                 }
-            }
-        },
-        "Nama Pengguna UP3": "$_id.unitName",
-        // "Tanggal Penerimaan DO": {
-        //     $cond: {
-        //         if : {
-        //             $or: [
-        //                 {
-        //                     $eq: ["$_id.tanggalDiterima", null]
-        //                 },
-        //                 {
-        //                     $eq: ["$_id.tanggalDiterima", "-"]
-        //                 }
-        //             ]
-        //         },
-        //         then: "-",
-        //         else : {
-        //             $dateToString: {
-        //                 format: "%d-%m-%Y",
-        //                 date: "$_id.tanggalDiterima"
-        //             }
-        //         }
-        //     }
-        // },
-        // "Nama Pengguna Unit Pelaksana": "$_id.unitCode",
-        // "Nama User Pengguna Unit Pelaksana": "$_id.unitName",
-        // "NamaUserPenggunaUnitPelaksana": "$_id.NamaUserPenggunaUnitPelaksana",
-        // "Nama Persetujuan Pengguna (Manager)": "$_id.msb",
-        "Tanggal Persetujuan Pengguna (Manager)": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.msbTanggal", null]
-                        },
-                        {
-                            $eq: ["$_id.msbTanggal", "-"]
+            },
+            "Nama Pengguna UP3": "$_id.unitName",
+            // "Tanggal Penerimaan DO": {
+            //     $cond: {
+            //         if : {
+            //             $or: [
+            //                 {
+            //                     $eq: ["$_id.tanggalDiterima", null]
+            //                 },
+            //                 {
+            //                     $eq: ["$_id.tanggalDiterima", "-"]
+            //                 }
+            //             ]
+            //         },
+            //         then: "-",
+            //         else : {
+            //             $dateToString: {
+            //                 format: "%d-%m-%Y",
+            //                 date: "$_id.tanggalDiterima"
+            //             }
+            //         }
+            //     }
+            // },
+            // "Nama Pengguna Unit Pelaksana": "$_id.unitCode",
+            // "Nama User Pengguna Unit Pelaksana": "$_id.unitName",
+            // "NamaUserPenggunaUnitPelaksana": "$_id.NamaUserPenggunaUnitPelaksana",
+            // "Nama Persetujuan Pengguna (Manager)": "$_id.msb",
+            "Tanggal Persetujuan Pengguna (Manager)": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.msbTanggal", null]
+                            },
+                            {
+                                $eq: ["$_id.msbTanggal", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.msbTanggal"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.msbTanggal"
                     }
                 }
-            }
-        },
-        // "Nama Persetujuan Pengguna (SRM)": "$_id.srm",
-        "Tanggal Persetujuan Pengguna (SRM)": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.srmTanggal", null]
-                        },
-                        {
-                            $eq: ["$_id.srmTanggal", "-"]
+            },
+            // "Nama Persetujuan Pengguna (SRM)": "$_id.srm",
+            "Tanggal Persetujuan Pengguna (SRM)": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.srmTanggal", null]
+                            },
+                            {
+                                $eq: ["$_id.srmTanggal", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.srmTanggal"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.srmTanggal"
                     }
                 }
-            }
-        },
-        // "Nama Persetujuan Pengguna (GM / PLH GM)": "$_id.gm",
-        "Tanggal Persetujuan Pengguna (GM / PLH GM)": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.gmTanggal", null]
-                        },
-                        {
-                            $eq: ["$_id.gmTanggal", "-"]
+            },
+            // "Nama Persetujuan Pengguna (GM / PLH GM)": "$_id.gm",
+            "Tanggal Persetujuan Pengguna (GM / PLH GM)": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.gmTanggal", null]
+                            },
+                            {
+                                $eq: ["$_id.gmTanggal", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.gmTanggal"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.gmTanggal"
                     }
                 }
-            }
-        },
-        "Tanggal Confirm PO": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.tanggalConfirmPO", null]
-                        },
-                        {
-                            $eq: ["$_id.tanggalConfirmPO", "-"]
+            },
+            "Tanggal Confirm PO": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.tanggalConfirmPO", null]
+                            },
+                            {
+                                $eq: ["$_id.tanggalConfirmPO", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.tanggalConfirmPO"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.tanggalConfirmPO"
                     }
                 }
-            }
-        },
-        "Tanggal Upload BABG": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.uploadBankGaransi", null]
-                        },
-                        {
-                            $eq: ["$_id.uploadBankGaransi", "-"]
+            },
+            "Tanggal Upload BABG": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.uploadBankGaransi", null]
+                            },
+                            {
+                                $eq: ["$_id.uploadBankGaransi", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.uploadBankGaransi"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.uploadBankGaransi"
                     }
                 }
-            }
-        },
-        "Tanggal Confirm BABG": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.babgConfirmedDate", null]
-                        },
-                        {
-                            $eq: ["$_id.babgConfirmedDate", "-"]
+            },
+            "Tanggal Confirm BABG": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.babgConfirmedDate", null]
+                            },
+                            {
+                                $eq: ["$_id.babgConfirmedDate", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.babgConfirmedDate"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.babgConfirmedDate"
                     }
                 }
-            }
-        },
-        "Status DO": "$_id.statusDO",
-        "Rating DO Responsiveness": "$_id.responsivenessAverage",
-        "Rating DO Quality": "$_id.qualityAverage",
-        "Rating DO Waktu Pengiriman": "$_id.deliveryAverage",
-         "No Surat Jalan": "$_id.noekspedisi",
-        "Nama Kurir": "$_id.namaKurir",
-        "Nama Transportir": "$_id.namaEkspedisi",
-        "Waktu Jalan": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.etd", null]
-                        },
-                        {
-                            $eq: ["$_id.etd", "-"]
+            },
+            "Status DO": "$_id.statusDO",
+            "Rating DO Responsiveness": "$_id.responsivenessAverage",
+            "Rating DO Quality": "$_id.qualityAverage",
+            "Rating DO Waktu Pengiriman": "$_id.deliveryAverage",
+            "No Surat Jalan": "$_id.noekspedisi",
+            "Nama Kurir": "$_id.namaKurir",
+            "Nama Transportir": "$_id.namaEkspedisi",
+            "Waktu Jalan": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.etd", null]
+                            },
+                            {
+                                $eq: ["$_id.etd", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.etd"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.etd"
                     }
                 }
-            }
-        },
-        "Perkiraan sampai": {
-            $cond: {
-                if : {
-                    $or: [
-                        {
-                            $eq: ["$_id.eta", null]
-                        },
-                        {
-                            $eq: ["$_id.eta", "-"]
+            },
+            "Perkiraan sampai": {
+                $cond: {
+                    if : {
+                        $or: [
+                            {
+                                $eq: ["$_id.eta", null]
+                            },
+                            {
+                                $eq: ["$_id.eta", "-"]
+                            }
+                        ]
+                    },
+                    then: "-",
+                    else : {
+                        $dateToString: {
+                            format: "%d-%m-%Y",
+                            date: "$_id.eta"
                         }
-                    ]
-                },
-                then: "-",
-                else : {
-                    $dateToString: {
-                        format: "%d-%m-%Y",
-                        date: "$_id.eta"
                     }
                 }
-            }
-        },
-    }
-}, 
+            },
+            
+        }
+    },
     {
         $sort: {
             "No PO": 1
         }
+    },
+		
+  // pipeline lu sebelumnya
+  {
+    $group: {
+      _id: null,
+      data: {
+        $push: "$$ROOT"
+      }
     }
-],{allowDiskUse:true})
+  },
+  {
+    $unwind: {
+      path: "$data",
+      includeArrayIndex: "nomor"
+    }
+  },
+  {
+    $project: {
+      _id: 0,
+      "No": {
+        $add: ["$nomor", 1]
+      },
+//       "data": 0,
+//       "No":      "$data.No",
+      "No PO":      "$data.No PO",
+      "No PO SAP":      "$data.No PO SAP",
+      "Tanggal PO":      "$data.Tanggal PO",
+      "Tanggal PO Dikirim":      "$data.Tanggal PO Dikirim",
+      "Nama Penyedia":      "$data.Nama Penyedia",
+      "Nama Unit Pengguna":      "$data.Nama Unit Pengguna",
+      "Bidang":      "$data.Bidang",
+      "Rating PO":      "$data.Rating PO",
+      "No AMS":      "$data.No AMS",
+      "No Kontrak":      "$data.No Kontrak",
+      "No Alokasi":      "$data.No Alokasi",
+      "No SKU":      "$data.No SKU",
+      "No Material SAP":      "$data.No Material SAP",
+      "Nama SKU":      "$data.Nama SKU",
+      "Qty PO":      "$data.Qty PO",
+      "Harga Satuan PO":      "$data.Harga Satuan PO",
+      "Total Harga Satuan PO":      "$data.Total Harga Satuan PO",
+      "Max Waktu Pengiriman":      "$data.Max Waktu Pengiriman",
+      "Subtotal PO":      "$data.Subtotal PO",
+      "Biaya Kirim":      "$data.Biaya Kirim",
+      "PPN":      "$data.PPN",
+      "Total PO":      "$data.Total PO",
+      "Tanggal BABG":      "$data.Tanggal BABG",
+      "Kategori PO":      "$data.Kategori PO",
+      "Status PO":      "$data.Status PO",
+      "Status Payment":      "$data.Status Payment",
+      "No DO":      "$data.No DO",
+      "Tanggal DO":      "$data.Tanggal DO",
+      "Qty DO Kirim":      "$data.Qty DO Kirim",
+      "Qty DO Terima":      "$data.Qty DO Terima",
+      "Tanggal Penerimaan DO":      "$data.Tanggal Penerimaan DO",
+      "Nama Pengguna UP3":      "$data.Nama Pengguna UP3",
+      "Tanggal Persetujuan Pengguna (Manager)":      "$data.Tanggal Persetujuan Pengguna (Manager)",
+      "Tanggal Persetujuan Pengguna (SRM)":      "$data.Tanggal Persetujuan Pengguna (SRM)",
+      "Tanggal Persetujuan Pengguna (GM / PLH GM)":      "$data.Tanggal Persetujuan Pengguna (GM / PLH GM)",
+      "Tanggal Confirm PO":      "$data.Tanggal Confirm PO",
+      "Tanggal Upload BABG":      "$data.Tanggal Upload BABG",
+      "Tanggal Confirm BABG":      "$data.Tanggal Confirm BABG",
+      "Status DO":      "$data.Status DO",
+      "Rating DO Responsiveness":      "$data.Rating DO Responsiveness",
+      "Rating DO Quality":      "$data.Rating DO Quality",
+      "Rating DO Waktu Pengiriman":      "$data.Rating DO Waktu Pengiriman",
+      "No Surat Jalan":      "$data.No Surat Jalan",
+      "Nama Kurir":      "$data.Nama Kurir",
+      "Nama Transportir":      "$data.Nama Transportir",
+      "Waktu Jalan":      "$data.Waktu Jalan",
+      "Perkiraan sampai":"$data.Perkiraan sampai",
+
+    }
+  }
+
+], {
+    allowDiskUse: true
+})
 //
 //
