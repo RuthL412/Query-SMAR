@@ -2,15 +2,9 @@ db.t_delivery_order.aggregate([
     {
         $match: {
             //				
-<<<<<<< HEAD
             _id: {
                 $in: [
   "DO202600029789",
-=======
-            nopo: {
-                $in: [
-"PO202600000097",
->>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
                 ]
             }
             //				noPoSAP:"8000015506"
@@ -86,15 +80,12 @@ db.t_delivery_order.aggregate([
         }
     },
 // 		{$match:{token:/draft/i}},
-<<<<<<< HEAD
 // 		{$match:{itemId:{$in:[
 // "PLNMP1652088299595195",
 // "PLNMP1652088059633533",
 // "PLNMP1652088003198798",
 // "PLNMP1652087560885385",
 // 		]}}},
-=======
->>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
     {
         $sort: {
             noDoLineItem: 1,
