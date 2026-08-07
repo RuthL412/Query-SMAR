@@ -2,7 +2,11 @@ db.t_purchase_order.aggregate([
     {
         $match: {
 				_id:{$in:[
+<<<<<<< HEAD
 				"PO202600009426"
+=======
+				"PO202600002678"
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
 				]},
 //            $expr: {
 //                $and: [{

@@ -3,7 +3,11 @@ db.t_purchase_order.aggregate([
         $match: {
             
             "details.noAlokasi": {
+<<<<<<< HEAD
                 $in: ["NAB20260119-100127"]
+=======
+                $in: ["NAB20260119-171604"]
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
             },
 //             "supplierName": /PT TRIPUTRA ELECTRIC ABADI/i,
             
@@ -166,7 +170,11 @@ db.t_purchase_order.aggregate([
     },
     {
         $match: {
+<<<<<<< HEAD
             noAlokasi: "NAB20260119-100127",
+=======
+            noAlokasi: "NAB20260119-171604",
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
             		slaVW:false,
             status: {
                 $nin: [/reject/i]

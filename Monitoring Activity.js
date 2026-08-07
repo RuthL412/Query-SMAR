@@ -3,7 +3,11 @@ db.t_purchase_order.aggregate([
         $match: {
             _id: {
                 $in: [
+<<<<<<< HEAD
                     "PO202100001400",
+=======
+                    "PO202500013081",
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
                     
                 ]
             }
@@ -105,7 +109,11 @@ db.t_purchase_order.aggregate([
                 _id: "$_id",
                 noPoSAP: "$noPoSAP",
                 tglPO: "$createdDate",
+<<<<<<< HEAD
                 kirimPO: "$poSendSupplierDate",
+=======
+                kirimPO: "$statusDate",
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
                 supplierName: "$supplierName",
                 buyerCode: "$buyerCode",
                 buyerName: "$buyerName",
@@ -252,6 +260,7 @@ db.t_purchase_order.aggregate([
                     else : "-",
                     
                 }
+<<<<<<< HEAD
             },uploadBankGaransi: {
                 
                 $cond: {
@@ -266,10 +275,13 @@ db.t_purchase_order.aggregate([
                     else : "-",
                     
                 }
+=======
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
             },
             "unitName": "$_id.unitName",
             "unitCode": "$_id.unitCode",
             msb: {
+<<<<<<< HEAD
                 $ifNull: [
                     {
                         $arrayElemAt: [
@@ -418,6 +430,102 @@ db.t_purchase_order.aggregate([
                     },
                     "-"
                 ]
+=======
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdName", 1]
+                        }, false]
+                    },
+                    then: {
+                        $arrayElemAt: ["$msb.createdName", 1]
+                    },
+                    else : "-"
+                }
+                    //                $arrayElemAt: ["$msb.createdName", 1]
+            },
+            msbTanggal: {
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdDate", 1]
+                        }, false]
+                    },
+                    then: {
+                        $add: [{
+                            $arrayElemAt: ["$msb.createdDate", 1]
+                        }, 7 * 60 * 60 * 1000],
+                        
+                    },
+                    else : "-"
+                }
+                    
+                //                $arrayElemAt: ["$msb.createdDate", 1]
+            },
+            srm: {
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdName", 2]
+                        }, false]
+                    },
+                    then: {
+                        $arrayElemAt: ["$msb.createdName", 2]
+                    },
+                    else : "-"
+                }
+                    //                $arrayElemAt: ["$srm.createdName", 1]
+            },
+            srmTanggal: {
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdDate", 2]
+                        }, false]
+                    },
+                    then: {
+                        $add: [{
+                            $arrayElemAt: ["$msb.createdDate", 2]
+                        }, 7 * 60 * 60 * 1000],
+                        
+                    },
+                    else : "-"
+                }
+                    
+                //                $arrayElemAt: ["$srm.createdDate", 1]
+            },
+            gm: {
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdName", 3]
+                        }, false]
+                    },
+                    then: {
+                        $arrayElemAt: ["$msb.createdName", 3]
+                    },
+                    else : "-"
+                }
+                    //                $arrayElemAt: ["$gm.createdName", 1]
+            },
+            gmTanggal: {
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdDate", 3]
+                        }, false]
+                    },
+                    then: {
+                        $add: [{
+                            $arrayElemAt: ["$msb.createdDate", 3]
+                        }, 7 * 60 * 60 * 1000],
+                        
+                    },
+                    else : "-"
+                }
+                    
+                //                $arrayElemAt: ["$gm.createdDate", 1]
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
             },
             poSendSupplierDate: {
                 $cond: {
@@ -429,6 +537,7 @@ db.t_purchase_order.aggregate([
                 }
             },
             tanggalConfirmPO: {
+<<<<<<< HEAD
                 $ifNull: [
                     {
                         $arrayElemAt: [
@@ -466,6 +575,41 @@ db.t_purchase_order.aggregate([
 //                     
 //                 }
 //             },
+=======
+                $cond: {
+                    if : {
+                        $ifNull: [{
+                            $arrayElemAt: ["$msb.createdDate", 5]
+                        }, false]
+                    },
+                    then: {
+                        $add: [{
+                            $arrayElemAt: ["$msb.createdDate", 5]
+                        }, 7 * 60 * 60 * 1000],
+                        
+                    },
+                    else : "-"
+                }
+                    
+                //                $arrayElemAt: ["$gm.createdDate", 1]
+            },
+            uploadBankGaransi: {
+                
+                $cond: {
+                    if : {
+                        $ifNull: ["$tanggalBankGaransi", false]
+                    },
+                    then: {
+                        $add: [{
+                            $arrayElemAt: ["$msb.createdDate", 6]
+                        }, 7 * 60 * 60 * 1000],
+                        
+                    },
+                    else : "-",
+                    
+                }
+            },
+>>>>>>> 89c032333b865a2cb51c4be254c7c9bb754d8298
             babgConfirmedDate: {
                 
                 $cond: {
