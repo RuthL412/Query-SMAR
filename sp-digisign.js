@@ -13,7 +13,7 @@ db.sp_integration_in_out_log.find({
     name:{$in:[
 //    "POST /o/digi-sign-open-api/upload-file",
 //    "POST https://plnsign.id/api/auth/generate-token",
-//        "POST https://plnsign.id/api/doc-sign","POST /uploadFile",
+       "POST https://plnsign.id/api/doc-sign",
 // 				"POST /o/digi-sign-open-api/upload-file",
 //    "POST https://plnsign.id/api/auth/generate-token",
 //    "POST https://plnsign.id/api/doc-sign",
@@ -21,9 +21,9 @@ db.sp_integration_in_out_log.find({
 //    "POST https://plnsign.id/api/verify-pdf"
 //				"POST https://plnsign.id/api/verify-pdf",
     //		 "POST https://amskorporat.pln.co.id/api/nde/documentbk/dynamic/",
-       "POST https://amskorporat.pln.co.id/api/nde/documentbk/upload_v2/F16110000/5462297/",
-       "POST https://amskorporat.pln.co.id/api/nde/documentbk/upload_v2/F16110000/5462301/",
-       "POST https://amskorporat.pln.co.id/api/nde/documentbk/upload_v2/F16110000/5462774/",
+//        "POST https://amskorporat.pln.co.id/api/nde/documentbk/upload_v2/F16110000/5462297/",
+//        "POST https://amskorporat.pln.co.id/api/nde/documentbk/upload_v2/F16110000/5462301/",
+//        "POST https://amskorporat.pln.co.id/api/nde/documentbk/upload_v2/F16110000/5462774/",
     ]},
 //    "req": {
 //        $in: [

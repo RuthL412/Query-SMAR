@@ -1,11 +1,16 @@
 db.t_delivery_order.aggregate([
     {
         $match: {
-            _created:{
-$gt:ISODate("2024-10-31T16:59:59.000Z"),
-$lte:ISODate("2025-12-31T16:59:59.000Z")
-},
-digiSignStatus:{$in:["INTERNAL","EKSTERNAL"]},
+            _created: {
+                $gte: ISODate("2025-12-31T16:59:59.999Z"),
+                $lte: ISODate("2026-04-30T16:59:59.999Z")
+//                 $gte: ISODate("2024-10-31T16:59:59.000Z"),
+//                 $lte: ISODate("2025-12-31T16:59:59.000Z")
+            },
+            digiSignStatus: {
+                $in: ["INTERNAL", "EKSTERNAL"]
+            },
+            
         }
     },
     {
@@ -143,7 +148,8 @@ digiSignStatus:{$in:["INTERNAL","EKSTERNAL"]},
                         else : 0,
                         
                     }
-                },lastApproveDigisignTug3Persediaan: {
+                },
+                lastApproveDigisignTug3Persediaan: {
                     
                     $cond: {
                         
@@ -152,9 +158,9 @@ digiSignStatus:{$in:["INTERNAL","EKSTERNAL"]},
                         },
                         then: "$detail.lastApproveDigisignTug3Persediaan",
                         else : 0
-                        
                     }
-                },lastApproveDigisignTug4Pemeriksaan: {
+                },
+                lastApproveDigisignTug4Pemeriksaan: {
                     
                     $cond: {
                         
@@ -163,7 +169,6 @@ digiSignStatus:{$in:["INTERNAL","EKSTERNAL"]},
                         },
                         then: "$detail.lastApproveDigisignTug4Pemeriksaan",
                         else : 0
-                        
                     }
                 },
                 
@@ -187,64 +192,77 @@ digiSignStatus:{$in:["INTERNAL","EKSTERNAL"]},
             tug3Url: "$_id.tug3Url",
             tug3KarantinaUrl: "$_id.tug3KarantinaUrl",
             tug4Url: "$_id.tug4Url",
-            lastApproveDigisignTug3Persediaan:{
-        $add: [ "$_id.lastApproveDigisignTug3Persediaan", 7 * 60 * 60 * 1000]   // +7 jam
-      },
+            lastApproveDigisignTug3Persediaan: {
+                $add: ["$_id.lastApproveDigisignTug3Persediaan", 7 * 60 * 60 * 1000] // +7 jam
+            },
             lastApproveDigisignTug3Karantina: {
-        $add: ["$_id.lastApproveDigisignTug3Karantina", 7 * 60 * 60 * 1000]   // +7 jam
-      },
+                $add: ["$_id.lastApproveDigisignTug3Karantina", 7 * 60 * 60 * 1000] // +7 jam
+            },
             lastApproveDigisignTug4Pemeriksaan: {
-        $add: ["$_id.lastApproveDigisignTug4Pemeriksaan", 7 * 60 * 60 * 1000]   // +7 jam
-      },
+                $add: ["$_id.lastApproveDigisignTug4Pemeriksaan", 7 * 60 * 60 * 1000] // +7 jam
+            },
+            
         }
     },
-		{$match:{
-		lastApproveDigisignTug4Pemeriksaan:{$ne:25200000}
-		}},
-{
-    $group: {
-      _id: {
-        year: {
-          $year: {
-            date: "$_created",
-            timezone: "Asia/Jakarta"
-          }
-        },
-        month: {
-          $month: {
-            date: "$_created",
-            timezone: "Asia/Jakarta"
-          }
+    {
+        $match: {
+            lastApproveDigisignTug4Pemeriksaan: {
+                $ne: 25200000
+            }
         }
-      },
-      total: { $sum: 1 }
+    },
+    {
+        $group: {
+            _id: {
+                year: {
+                    $year: {
+                        date: "$_created",
+                        timezone: "Asia/Jakarta"
+                    }
+                },
+                month: {
+                    $month: {
+                        date: "$_created",
+                        timezone: "Asia/Jakarta"
+                    }
+                }
+            },
+            total: {
+                $sum: 1
+            }
+        }
+    },
+    {
+        $addFields: {
+            bulan: {
+                $concat: [
+                    {
+                        $arrayElemAt: [
+                            ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                            {
+                                $subtract: ["$_id.month", 1]
+                            }
+                        ]
+                    },
+                    "-",
+                    {
+                        $substr: ["$_id.year", 2, 2]
+                    }
+                ]
+            }
+        }
+    },
+    {
+        $sort: {
+            "_id.year": 1,
+            "_id.month": 1
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            bulan: 1,
+            total: 1
+        }
     }
-  },
-
-  {
-    $addFields: {
-      bulan: {
-        $concat: [
-          {
-            $arrayElemAt: [
-              ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
-              { $subtract: ["$_id.month", 1] }
-            ]
-          },
-          "-",
-          { $substr: ["$_id.year", 2, 2] }
-        ]
-      }
-    }
-  },
-
-  { $sort: { "_id.year": 1, "_id.month": 1 } },
-
-  {
-    $project: {
-      _id: 0,
-      bulan: 1,
-      total: 1
-    }
-  }
 ]);

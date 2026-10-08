@@ -11,17 +11,23 @@ db.m_new_alokasi_bulanan_kontrak.aggregate([
     {
         $unwind: {
             path: "$details",
-            includeArrayIndex: "indexDetail" // <= menambahkan indeks
+            //             includeArrayIndex: "indexDetail" // <= menambahkan indeks
         }
+    },
+    {
+        $unwind: "$listSKU"
     },
     {
         $group: {
             _id: {
                 noAlokasi: "$_id",
-                supplierName: "$details.supplierName",
-                totalRealisasi: "$details.totalRealisasi",
-                noKontrak: "$details.noKontrak",
-                index: "$indexDetail" // <= tambahkan indeks ke _id grup
+                startDate: "$startDate",
+                endDate: "$endDate",
+                //                 supplierName: "$details.supplierName",
+                noSku: "$listSKU.noSku",
+                //                 totalRealisasi: "$details.totalRealisasi",
+                //                 noKontrak: "$details.noKontrak",
+                //                 index: "$indexDetail" // <= tambahkan indeks ke _id grup
             }
         }
     },
@@ -29,7 +35,10 @@ db.m_new_alokasi_bulanan_kontrak.aggregate([
         $project: {
             _id: 0,
             noAlokasi: "$_id.noAlokasi",
+            startDate: "$_id.startDate",
+            endDate: "$_id.endDate",
             supplierName: "$_id.supplierName",
+            noSku: "$_id.noSku",
             totalRealisasi: "$_id.totalRealisasi",
             noKontrak: "$_id.noKontrak",
             index: "$_id.index" // <= tampilkan indeks
@@ -37,47 +46,65 @@ db.m_new_alokasi_bulanan_kontrak.aggregate([
     },
     {
         $lookup: {
-            from: "f",
+            from: "m_product_sku",
             let: {
-                alokasi: "$noAlokasi",
-                supplier: "$supplierName"
+                sku: "$noSku"
             },
             pipeline: [
                 {
                     $match: {
                         $expr: {
                             $and: [{
-                                $eq: ["$noAlokasi", "$$alokasi"]
-                            }, {
-                                $eq: ["$supplierName", "$$supplier"]
+                                $eq: ["$_id", "$$sku"]
                             }]
                         }
                     }
                 },
+                {
+                    $project: {
+                        _id: 0,
+                        noSap: 1,
+                        satuanType: 1,
+                        skuType: 1
+                    }
+                },
                 
             ],
-            as: "tambahan"
+            as: "sku",
+            
         }
     },
-		{$unwind:"$tambahan"},
-		{$project:{
-		"noAlokasi":"$noAlokasi",
-"supplierName":"$supplierName",
-"realisasi":"$totalRealisasi",
-tambahan:"$tambahan.addRealisasi",
-"noKontrak":"$noKontrak",
-"index":"$index",
-totalRealisasi:{$add:["$totalRealisasi",{$toInt:"$tambahan.addRealisasi"}]},
-query:{$concat:[
-"db.m_new_alokasi_bulanan_kontrak.updateOne({_id:'","$noAlokasi","'},{$set:{'details.",{$toString:"$index"},".totalRealisasi':NumberLong('",{$toString:{$add:["$totalRealisasi",{$toInt:"$tambahan.addRealisasi"}]}},"'),'details.",{$toString:"$index"},".tambahanRealisasi':NumberLong('",{$toString:"$tambahan.addRealisasi",},"')}});"
-]}
-
-
-		}},
     {
-        $sort: {
-            noAlokasi: 1,
-						index:1
-        }
-    }
-])
+        $unwind: "$sku"
+    },
+    {
+        $project: {
+            noAlokasi: "$noAlokasi",
+            materialType: "$sku.skuType",
+            materialNumber: "$sku.noSap",
+            version: "1",
+            UoM: "$sku.satuanType",
+            startDate: {
+                $dateToString: {
+                    format: "%d-%m-%Y",
+                    date: {
+                        $add: ["$startDate", 7 * 60 * 60 * 1000]
+                    }
+                }
+            },
+            endDate: {
+                $dateToString: {
+                    format: "%d-%m-%Y",
+                    date: {
+                        $add: ["$endDate", 7 * 60 * 60 * 1000]
+                    }
+                }
+            },
+						allocationType:"P"
+						}},
+            {
+                $sort: {
+                    noAlokasi: 1,
+                    index: 1
+                }
+            }])

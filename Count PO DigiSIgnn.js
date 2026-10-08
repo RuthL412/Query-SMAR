@@ -1,7 +1,9 @@
 db.t_purchase_order.aggregate([{$match:{
 _created:{
- $gte: ISODate("2024-10-31T17:00:00.000Z"), 
-      $lte: ISODate("2025-12-31T16:59:59.999Z") 
+			$gte: ISODate("2025-12-31T16:59:59.999Z"),
+      $lte: ISODate("2026-04-30T16:59:59.999Z") 
+// 			 $gte: ISODate("2024-10-31T17:00:00.000Z"), 
+//       $lte: ISODate("2025-12-31T16:59:59.999Z") 
 },
 digiSignStatus:{$in:["INTERNAL","EKSTERNAL"]},
 digiSignResSupplier:{$exists:true},

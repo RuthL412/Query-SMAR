@@ -2,7 +2,8 @@ db.t_purchase_order.aggregate([
     {
         $match: {
 				_id:{$in:[
-				"PO202600009426"
+				"PO202600007886",
+				"PO202600006601"
 				]},
 //            $expr: {
 //                $and: [{
@@ -151,9 +152,9 @@ db.t_purchase_order.aggregate([
             "index": "$index",
         }
     },
-		{$match:{
-		SLA:{$lt:240}
-		}},
+// 		{$match:{
+// 		SLA:{$lt:240}
+// 		}},
     {
         $sort: {
             "No PO":  1,

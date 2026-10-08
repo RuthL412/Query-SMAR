@@ -1,11 +1,13 @@
 db.t_purchase_order.aggregate([
     {
         $match: {
-            _id: {
-                $in: [
-                    "PO202600005641"
-                ]
-            }
+				status:{$nin:[/reject/i]},
+//             _id: {
+//                 $in: [
+//                     "PO202600005641"
+//                 ]
+//             }
+ "details.slaVW": true
         }
     },
     {
@@ -14,6 +16,8 @@ db.t_purchase_order.aggregate([
     {
         $project: {
             _id: "$_id",
+            mims: "$mims",
+            srmSubBidang: "$srmSubBidang",
             noPoSAP: {
                 $cond: {
                     if : {
@@ -41,6 +45,8 @@ db.t_purchase_order.aggregate([
             _id: {
                 _id: "$_id",
                 noPoSAP: "$noPoSAP",
+								            mims: "$mims",
+								            srmSubBidang: "$srmSubBidang",
                 tglPO: "$createdDate",
                 kirimPO: "$statusDate",
                 supplierName: "$supplierName",
@@ -72,6 +78,8 @@ db.t_purchase_order.aggregate([
     {
         $project: {
             _id: "$_id._id",
+            mims: "$_id.mims",
+            srmSubBidang: "$_id.srmSubBidang",
             noPoSAP: "$_id.noPoSAP",
             tglPO: {
                 $add: ["$_id.tglPO", 7 * 60 * 60 * 1000]
@@ -163,7 +171,10 @@ db.t_purchase_order.aggregate([
                         },
                         statusDO: "$detail.status",
                         noGrSAP: "$detail.noGrSAP",
-                        index: "$indexDetail"
+                        index: "$indexDetail",
+												token:{
+												$ifNull:["$detail.token","-"]
+												}
                     }
                 }
             ],
@@ -181,6 +192,8 @@ db.t_purchase_order.aggregate([
         $group: {
             _id: {
                 _id: "$_id",
+                mims: "$mims",
+                srmSubBidang: "$srmSubBidang",
                 "No PO SAP": "$noPoSAP",
                 "Tanggal PO": "$tglPO",
                 "Tanggal PO Dikirim": "$kirimPO",
@@ -202,6 +215,7 @@ db.t_purchase_order.aggregate([
                 "Total PO": "$hargaTotal",
                 "Status PO": "$status",
                 "No DO": "$DO._id",
+                "token": "$DO.token",
                 "Tanggal DO": "$DO.doKirim",
                 "Tanggal DO Di Terima": "$DO.tanggalDiterima",
                 "ratingDate": "$DO.ratingDate",
@@ -222,6 +236,9 @@ db.t_purchase_order.aggregate([
         $project: {
             
             _id: "$_id._id",
+            mims: "$_id.mims",
+            srmSubBidang: "$_id.srmSubBidang",
+            token: "$_id.token",
             "No PO SAP": "$_id.No PO SAP",
             "Tanggal PO": "$_id.Tanggal PO",
             "Tanggal PO Dikirim": "$_id.Tanggal PO Dikirim",
@@ -277,7 +294,8 @@ db.t_purchase_order.aggregate([
     },
     {
         $sort: {
-            "No DO": 1
+//             "No DO": 1,
+						mims:-1
         }
     }
 ])
