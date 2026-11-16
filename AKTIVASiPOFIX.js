@@ -2,14 +2,6 @@ db.t_purchase_order.aggregate([
     {
         $match: {
 
-				"details.noAlokasi":{$in:["NA20260130-093537"	]},
-//"details.sku": "1636794828510",
-//    "supplierId": "577ff483-7984-4ae8-94d3-14ec14a20ee8",
-   "supplierName": "PT MAKMUR JAYA ",
-//    "buyerId": "pln_kw_uiw_kaltimra",
-   "buyerName": "UID Jawa Timur",
-//				status:{$in:[
-////				"APPROVED_GM",
 //                                        //                                        "APPROVED_MSB",
 //                                        //                                        "APPROVED_SRM",
 //                                        "APPROVED_SUPPLIER",
@@ -23,22 +15,14 @@ db.t_purchase_order.aggregate([
 //                                        //                                        "REQUESTED_DIGISIGN_GM",
 //                                        "REQUESTED_DIGISIGN_SUPPLIER"
 //				]}
-// 				   _id: {
-//                 $in: [
-// "PO202500013764",
-// "PO202500013773",
-// "PO202500013848",
-// "PO202500013849",
-// "PO202500013851",
-// "PO202500014071",
-// "PO202500014073",
-// "PO202500014176",
-// "PO202500014177",
-// "PO202500014225",
-// "PO202500014251",
-// "PO202500014251",
-//                 ]
-//             }
+				   _id: {
+                $in: [
+"PO202600012264",
+"PO202600012222",
+"PO202600012218",
+"PO202600012216",
+                ]
+            }
 // //
         }
     },
@@ -205,10 +189,10 @@ db.t_purchase_order.aggregate([
             }
         }
     },
-		{$match:{
-		noAlokasi:"NA20260130-093537",
-		status:{$nin:[/reject/i]}
-		}},
+// 		{$match:{
+// 		noAlokasi:"NA20260130-093537",
+// 		status:{$nin:[/reject/i]}
+// 		}},
 
     {
         $sort: {

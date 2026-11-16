@@ -21,17 +21,20 @@ db.sys_auth_user.aggregate([
     {
         $project: {
             _id: 0,
+						username:"$username",
+						email:"$email",
+						nip:"$nip",
+           roles: {$arrayElemAt:["$roles",1]},
+            fullName: "$fullName",
             companyCode: "$company.companyCode",
             companyName: "$companyName",
-						nip:"$nip",
-//            companyLevel: "$companyLevel",
-            fullName: "$fullName",
             status: "$status"
         }
     },
     {
         $sort: {
-            companyName: -1
+            companyName: 1,
+						roles:1
         }
     }
 ])

@@ -1,9 +1,9 @@
 
 db.sp_integration_in_out_log.find({
  "name": "POST http://erpapprv.pusat.corp.pln.co.id:8001/api/mp/ifpo?sap-client=100&saml2=disabled",
-_created:{$gte:ISODate("2025-02-04T08:11:28.781Z")},
-"req.0.no_pengadaan":"PO202500000363"
-}).sort({_created:1}).limit(1)
+// _created:{$gte:ISODate("2025-02-04T08:11:28.781Z")},
+"req.0.no_pengadaan":"PO202600010636"
+}).sort({_created:-1}).limit(1)
 
 db.sp_integration_in_out_log.find({"req.0.no_pengadaan":{$exists:true},"success": false,}).sort({_created:-1}).limit(1)
 

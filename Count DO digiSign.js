@@ -2,8 +2,8 @@ db.t_delivery_order.aggregate([
     {
         $match: {
             _created: {
-                $gte: ISODate("2025-12-31T16:59:59.999Z"),
-                $lte: ISODate("2026-04-30T16:59:59.999Z")
+                $gte: ISODate("2026-04-30T16:59:59.999Z"),
+      $lte: ISODate("2026-09-30T16:59:59.999Z") 
 //                 $gte: ISODate("2024-10-31T16:59:59.000Z"),
 //                 $lte: ISODate("2025-12-31T16:59:59.000Z")
             },

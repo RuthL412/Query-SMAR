@@ -1,13 +1,13 @@
 db.t_purchase_order.aggregate([
     {
         $match: {
-				status:{$nin:[/reject/i]},
-//             _id: {
-//                 $in: [
-//                     "PO202600005641"
-//                 ]
-//             }
- "details.slaVW": true
+// 				status:{$nin:[/reject/i]},
+            _id: {
+                $in: [
+                    "PO202600000463"
+                ]
+            }
+//  "details.slaVW": true
         }
     },
     {

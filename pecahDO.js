@@ -4,7 +4,8 @@ db.t_delivery_order.aggregate([
             //				
             _id: {
                 $in: [
-  "DO202600029789",
+"DO202600042789",
+
                 ]
             }
             //				noPoSAP:"8000015506"
@@ -79,7 +80,7 @@ db.t_delivery_order.aggregate([
             
         }
     },
-// 		{$match:{token:/draft/i}},
+// 		{$match:{noGrSAP:{$exists:false}}},
 // 		{$match:{itemId:{$in:[
 // "PLNMP1652088299595195",
 // "PLNMP1652088059633533",
@@ -101,3 +102,6 @@ db.t_delivery_order.aggregate([
 //db.t_delivery_order.find({nopo:"PO202500003809"}).limit(1)
 
 
+// db.t_delivery_order.find({_id:"DO202600042789"})
+// 
+// db.t_delivery_order.updateOne({_id:"DO202600042789"},{$set:{"detail.0.ratingDate": ISODate("2026-11-03T02:13:54.924Z"),}})
