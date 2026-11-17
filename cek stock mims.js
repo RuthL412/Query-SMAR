@@ -2,9 +2,9 @@ db.m_kontrak_pengadaan.aggregate([
     {
         $match: {
             noKontrak: "2045.Pj/DAN.01.01/F01020000/2025",
-            status: {
-                $nin: ["TIDAK_AKTIF"]
-            },
+//             status: {
+//                 $nin: ["TIDAK_AKTIF"]
+//             },
             latest: true
         }
     },
@@ -21,7 +21,8 @@ db.m_kontrak_pengadaan.aggregate([
                 skuName: "$materials.skuId",
                 skuName: "$materials.skuId",
                 price: "$materials.contractPrice",
-                volKhs: "$materials.skuName"
+                volKhs: "$materials.jumlahSuplai",
+                skuName: "$materials.skuName"
             }
         }
     },
@@ -34,7 +35,8 @@ db.m_kontrak_pengadaan.aggregate([
             skuName: "$_id.skuName",
             productId: "$_id.productId",
             price: "$_id.price",
-            volKhs: "$_id.volKhs"
+                volKhs: "$_id.volKhs",
+                skuName: "$_id.skuName"
         }
     },
     {
@@ -59,49 +61,10 @@ db.m_kontrak_pengadaan.aggregate([
     {
         $unwind: "$sku"
     },
-    //     {
-    //         $addFields: {
-    //             noMaterial: {
-    //                 $ifNull: [
-    //                     {
-    //                         $arrayElemAt: ["$sku.noSap", 0]
-    //                     },
-    //                     "-"
-    //                 ]
-    //             }
-    //         }
-    //     },
     {
         $project: {
-            
-            
-            // boq_type: "$sku.skuType",
-            // satuan: "$sku.satuanName",
-            // jumlah: {
-            //     $multiply: ["$volKhs", {
-            //     $cond: {
-            //         if : {
-            //             $ifNull:["$price",true]
-            //         },
-            //         then: "$sku.hps",
-            //         else : "$price",
-            
-            //     }
-            // },]
-            // },
-            // harga_satuan: {
-            //     $cond: {
-            //         if : {
-            //             $ifNull:["$price",true]
-            //         },
-            //         then: "$sku.hps",
-            //         else : "$price",
-            
-            //     }
-            // },
             supplierName: "$supplierName",
             volume_khs: "$volKhs",
-//             is_ust: "$sku.isUst",
             material: "$skuName",
             contract_clms_no: "$noKontrak",
             nomor_material: "$sku.noSap",
@@ -147,12 +110,60 @@ db.m_kontrak_pengadaan.aggregate([
     },
     {
         $match: {
-// 				volume_khs:{$gt:0},
             nomor_material: {
                 $in: [
        "000000000003210020",
                 ]
             }
+        }
+    },
+    {
+        $lookup: {
+            from: "t_historikal_stok_produk",
+            let: {
+                produk: "$productId"
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $eq: ["$productId", "$$produk"]
+                        }
+                    }
+                },
+                {$sort:{
+                    _created:-1
+
+                }},
+                {
+                    $limit: 200
+                }
+            ],
+            as: "history"
+        }
+    },
+        {
+        $lookup: {
+            from: "m_ust_request_elab_summary",
+            let: {
+                kontrak: "$contract_clms_no",
+                sku: "$material",
+            },
+            pipeline: [
+                {
+                    $match: {
+                        $expr: {
+                            $and:[
+
+                                {$eq: ["$noKontrak", "$$kontrak"]},
+                                {$eq: ["$materialName", "$$sku"]}
+                            ]
+                        }
+                    }
+                },
+               
+            ],
+            as: "summary"
         }
     },
     {
